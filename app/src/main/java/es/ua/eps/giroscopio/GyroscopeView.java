@@ -9,41 +9,30 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
-public class GyroscopeView extends View {
-    private final static float DEFAULT_WIDTH_DP = 100;
-    private final static float DEFAULT_HEIGHT_DP = 100;
-    private final static float GYROSCOPE_DISTANCE_FACTOR = 20f; // Multiplicaremos el valor del giroscopio por este número
+import java.util.ArrayList;
 
-    private GyroscopeBitmap[] mLayers;
+public class GyroscopeView extends View {
+    private final static float DEFAULT_WIDTH_DP = 100f;
+    private final static float DEFAULT_HEIGHT_DP = 100f;
+    private final static float GYROSCOPE_DISTANCE_FACTOR = 2.5f; // Ajusta la distancia en función del valor obtenido por el girosopio
+
+    private ArrayList<GyroscopeBitmap> mLayers = new ArrayList<>();
 
     public GyroscopeView(Context context) {
         super(context);
-        init();
     }
 
     public GyroscopeView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public GyroscopeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public GyroscopeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
-    }
-
-    private void init() {
-        mLayers = new GyroscopeBitmap[] {
-            new GyroscopeBitmap(getContext(), R.drawable.layer03, 1.5f),
-            new GyroscopeBitmap(getContext(), R.drawable.layer02, 0.5f),
-            new GyroscopeBitmap(getContext(), R.drawable.layer01, 0.5f),
-            new GyroscopeBitmap(getContext(), R.drawable.layer00, 0.25f)
-        };
     }
 
     @Override
@@ -72,9 +61,15 @@ public class GyroscopeView extends View {
         }
     }
 
+    public void addLayer(int drawableResId, float distanceFactor, float scale) {
+        GyroscopeBitmap layer = new GyroscopeBitmap(getContext(), drawableResId, distanceFactor, scale);
+        layer.onContainerSizeChanged(getMeasuredWidth(), getMeasuredHeight()); // Por si se añade después de calcular las medidas de la vista
+        mLayers.add(layer);
+    }
+
     public void onGyroscopeChanged(float dX, float dY) {
         // Según los valores obtenidos del giroscopio, obtenemos la distancia a la que moveremos los bitmaps
-        float[] distanceMoved = new float[] {dX * GYROSCOPE_DISTANCE_FACTOR, dY * GYROSCOPE_DISTANCE_FACTOR};
+        float[] distanceMoved = new float[] {-dX * GYROSCOPE_DISTANCE_FACTOR, -dY * GYROSCOPE_DISTANCE_FACTOR};
 
         // La primera capa se mueve según la distancia almacenada en "distanceMoved" (obtenida usando el giroscopio)
         // y el resto de capas se mueven según la distancia a la que se ha podido mover la capa anterior
