@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="es.ua.eps.giroscopio">
 
-    <!-- Uso el giroscopio, pero no es requerido para usar esta app -->
+    <!-- Uso el giroscopio, y es requerido para usar esta app -->
     <uses-feature
         android:name="android.hardware.sensor.gyroscope"
         android:required="true" />
